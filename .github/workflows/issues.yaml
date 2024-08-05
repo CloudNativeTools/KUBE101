@@ -7,17 +7,8 @@ on:
       - "reopened"
 
 jobs:
-  send-issues:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: send issues
-      run: |
-        message="https://github.com/CottonAcademy/KUBE101/issues/${{ github.event.issue.number }}"
-        curl "${{ secrets.WECHAT_WEBHOOK }}" -H 'Content-Type: application/json' -d '
-            {
-                "msgtype": "text",
-                "text": {
-                  "content": "'"$message"'"
-                }
-            }'
+  patch-release:
+      runs-on: ubuntu-latest
+      steps:
+        echo "${{ github.event.issue.body }}" 
+      
