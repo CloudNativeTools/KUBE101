@@ -1,3 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: helm-repo-nginx-config
+data:
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name charts.kubesphere.com.cn;
+        
+        location / {
+            root /website/helm-charts;
+            autoindex on;
+            autoindex_format html;
+            autoindex_exact_size off;
+            autoindex_localtime on;
+        }
+    }
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,29 +51,42 @@ spec:
         - --sync-timeout=600s
         - --exechook-timeout=120s
         - --max-failures=3
-        image: kubespheredev/git-sync-hugo:v4.0.0-0.127.0
+        image: swr.cn-southwest-2.myhuaweicloud.com/ks/kubespheredev/git-sync-hugo:v4.0.0-0.127.0
         imagePullPolicy: IfNotPresent
         name: git-sync
         volumeMounts:
         - mountPath: /website
           name: chartmuseum
-      - name: chartmuseum
-        image: ghcr.io/helm/chartmuseum:v0.16.2
-        env:
-        - name: PORT
-          value: "8080"
-        - name: STORAGE
-          value: "local"
-        - name: STORAGE_LOCAL_ROOTDIR
-          value: "/website/helm-charts"
-        - name: DISABLE_API
-          value: "false"
+      # - name: chartmuseum
+      #   image: ghcr.io/helm/chartmuseum:v0.16.2
+      #   env:
+      #   - name: PORT
+      #     value: "8080"
+      #   - name: STORAGE
+      #     value: "local"
+      #   - name: STORAGE_LOCAL_ROOTDIR
+      #     value: "/website/helm-charts"
+      #   - name: DISABLE_API
+      #     value: "false"
+      #   ports:
+      #   - containerPort: 8080
+      #   volumeMounts:
+      #   - name: chartmuseum
+      #     mountPath: /website
+      - name: nginx
+        image: swr.cn-southwest-2.myhuaweicloud.com/ks/library/nginx:alpine
         ports:
-        - containerPort: 8080
+        - containerPort: 80
         volumeMounts:
+        - name: config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: nginx.conf
         - name: chartmuseum
-          mountPath: /website
+          mountPath: /website/helm-charts
       volumes:
+      - name: config
+        configMap:
+          name: helm-repo-nginx-config
       - name: chartmuseum
         persistentVolumeClaim:
           claimName: ks-chartmuseum-0
@@ -91,10 +122,10 @@ metadata:
   namespace: kubesphere
 spec:
   ports:
-  - name: http-8080
-    port: 8080
+  - name: http-80
+    port: 80
     protocol: TCP
-    targetPort: 8080
+    targetPort: 80
   selector:
     app: chartmuseum
   sessionAffinity: None
@@ -161,7 +192,7 @@ spec:
           service:
             name: ks-chartmuseum-com-cn
             port:
-              number: 8080
+              number: 80
         path: /
         pathType: Prefix
   tls:
