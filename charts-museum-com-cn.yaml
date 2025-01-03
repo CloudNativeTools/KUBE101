@@ -5,19 +5,31 @@ metadata:
   namespace: kubesphere
 data:
   nginx.conf: |
-    server {
-        listen 80;
-        server_name _;
-        add_header Access-Control-Allow-Origin "*";
-        location / {
-            root /website/helm-charts;
-            autoindex on;
-            autoindex_format html;
-            autoindex_exact_size off;
-            autoindex_localtime on;
-            types {
-                text/yaml yaml;
-                application/x-tar tgz;
+    events {
+        worker_connections 1024;
+    }
+    
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        server {
+            listen 80;
+            server_name _;
+            
+            add_header Access-Control-Allow-Origin "*";
+            
+            location / {
+                root /website/helm-charts;
+                autoindex on;
+                autoindex_format html;
+                autoindex_exact_size off;
+                autoindex_localtime on;
+                
+                types {
+                    text/yaml yaml;
+                    application/x-tar tgz;
+                }
             }
         }
     }
