@@ -5,7 +5,7 @@ metadata:
   labels:
     app: chartmuseum
   name: ks-chartmuseum-com-cn
-  namespace: kubesphere-website-system
+  namespace: kubesphere
 spec:
   replicas: 1
   selector:
@@ -69,7 +69,7 @@ metadata:
   labels:
     app: chartmuseum
   name: ks-chartmuseum-0
-  namespace: kubesphere-website-system
+  namespace: kubesphere
 spec:
   accessModes:
   - ReadWriteOnce
@@ -88,7 +88,7 @@ metadata:
   labels:
     app: chartmuseum
   name: ks-chartmuseum-com-cn
-  namespace: kubesphere-website-system
+  namespace: kubesphere
 spec:
   ports:
   - name: http-8080
@@ -127,7 +127,7 @@ metadata:
     app: kubesphere
     component: demo
   name: charts-kubesphere-com-cn
-  namespace: kubesphere-website-system
+  namespace: kubesphere
 spec:
   dnsNames:
   - charts.kubesphere.com.cn
@@ -151,7 +151,7 @@ metadata:
       more_set_headers "X-Frame-Options: SAMEORIGIN";
     nginx.ingress.kubernetes.io/use-regex: "true"
   name: charts-kubesphere-com-cn
-  namespace: kubesphere-website-system
+  namespace: kubesphere
 spec:
   rules:
   - host: charts.kubesphere.com.cn
