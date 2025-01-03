@@ -84,7 +84,7 @@ spec:
         - containerPort: 80
         volumeMounts:
         - mountPath: /etc/nginx/nginx.conf
-          name: nginx
+          name: config
           readOnly: true
           subPath: nginx.conf
         - name: chartmuseum
