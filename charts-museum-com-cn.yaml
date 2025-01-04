@@ -4,34 +4,29 @@ metadata:
   name: helm-repo-nginx-config
   namespace: kubesphere
 data:
-  nginx.conf: |
-    events {
-        worker_connections 1024;
-    }
-    
+  nginx.conf: | 
     http {
-        include       /etc/nginx/mime.types;
-        default_type  application/octet-stream;
+      autoindex on;             #开启索引功能
+      autoindex_exact_size off; # 关闭计算文件确切大小（单位bytes），只显示大概大小（单位kb、mb、gb）
+      autoindex_localtime on;   # 显示本机时间而非 GMT 时间
+      charset utf-8; # 避免中文乱码
 
-        server {
-            listen 80;
-            server_name _;
-            
-            add_header Access-Control-Allow-Origin "*";
-            
-            location / {
-                root /website/charts;
-                autoindex on;
-                autoindex_format html;
-                autoindex_exact_size off;
-                autoindex_localtime on;
-                
-                types {
-                    text/yaml yaml;
-                    application/x-tar tgz;
-                }
-            }
+      server {
+        listen       80; #监听端口号
+        server_name  localhost;
+        root         /website/charts; # 共享的文件目录
+
+        location / {
         }
+
+        error_page 404 /404.html;
+          location = /40x.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+          location = /50x.html {
+        }
+      }
     }
 ---
 apiVersion: apps/v1
